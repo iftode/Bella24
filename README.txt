@@ -1,56 +1,56 @@
-# 👗 Bella24 - Fashion E-commerce Platform
+# 👗 Bella24 – Fashion E-commerce Platform
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
-![Flask](https://img.shields.io/badge/Flask-3.x-green)
+![Flask](https://img.shields.io/badge/Flask-Web_Framework-green)
 ![SQLite](https://img.shields.io/badge/SQLite-Database-blue)
 ![HTML5](https://img.shields.io/badge/HTML5-orange)
 ![CSS3](https://img.shields.io/badge/CSS3-blue)
 ![JavaScript](https://img.shields.io/badge/JavaScript-yellow)
 
-A modern multilingual e-commerce platform developed with **Python (Flask)**.
+Bella24 is a full-stack e-commerce platform developed with **Python** and **Flask**.
 
-The application allows customers to browse products, place orders and manage their accounts, while administrators can manage products, categories, orders and invoices from a dedicated dashboard.
-
----
-
-# Live Demo
-
-🌐 https://bella24.site
+The application allows customers to browse products, search by category, place orders, manage their accounts and use a multilingual interface. An integrated administration panel enables complete management of products, categories, orders and customers.
 
 ---
 
-# Features
+# 🌐 Live Demo
+
+https://bella24.site
+
+---
+
+# 🚀 Features
 
 ## Customer
 
-- User registration & authentication
-- Product catalog
-- Product search
-- Product categories
-- Shopping cart
+- User Registration & Login
+- Product Catalog
+- Product Categories
+- Product Search
+- Shopping Cart
 - Checkout
-- Order history
-- Responsive design
-- Multiple languages
-- Contact page
+- Order History
+- Responsive Design
+- Multi-language Interface
+- Contact Page
 
 ---
 
 ## Administrator
 
 - Admin Dashboard
-- Product management
-- Category management
-- Order management
-- Customer management
-- Image upload
-- Invoice generation
-- Shipment management
-- Return management
+- Product Management
+- Category Management
+- Customer Management
+- Order Management
+- Invoice Generation
+- Product Image Upload
+- Shipment Management
+- Return Management
 
 ---
 
-# Technologies
+# 🛠 Technologies
 
 - Python
 - Flask
@@ -64,67 +64,62 @@ The application allows customers to browse products, place orders and manage the
 
 ---
 
-# Project Structure
+# 📂 Project Structure
 
 ```
 Bella24
 │
+├── database/
 ├── static/
 │   ├── css/
 │   ├── js/
-│   ├── uploads/
-│   └── images/
+│   ├── images/
+│   └── uploads/
 │
 ├── templates/
 │
-├── instance/
+├── screenshots/
 │
 ├── app.py
-│
 ├── requirements.txt
-│
 └── README.md
 ```
 
 ---
 
-# Screenshots
+# 📸 Screenshots
 
-Create a folder named **screenshots** and add images such as:
-
-```
-screenshots/
-```
-
-Recommended screenshots:
-
-- Homepage
-- Product Details
-- Shopping Cart
-- Checkout
-- Admin Dashboard
-- Product Management
-- Mobile Version
-
-Then reference them here:
-
-```markdown
 ## Homepage
 
-![Homepage](screenshots/homepage.png)
-
-## Products
-
-![Products](screenshots/products.png)
-
-## Admin Dashboard
-
-![Dashboard](screenshots/dashboard.png)
-```
+![](screenshots/homepage.png)
 
 ---
 
-# Installation
+## Products
+
+![](screenshots/produse.png)
+
+---
+
+## Checkout
+
+![](screenshots/checkout.png)
+
+---
+
+## Contact
+
+![](screenshots/contact.png)
+
+---
+
+## Language Selector
+
+![](screenshots/language_selector.png)
+
+---
+
+# ⚙ Installation
 
 Clone repository
 
@@ -152,13 +147,13 @@ Linux
 source env/bin/activate
 ```
 
-Install packages
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run
+Run application
 
 ```bash
 python app.py
@@ -166,36 +161,34 @@ python app.py
 
 ---
 
-# Skills demonstrated
+# 💻 Skills Demonstrated
 
-- Full Stack Development
+- Full Stack Web Development
 - Backend Development
-- REST principles
 - Database Design
 - Authentication
 - CRUD Operations
-- Responsive UI
+- Responsive Design
 - SQL
 - Flask
 - Python
+- HTML/CSS
+- JavaScript
 
 ---
 
-# Author
+# 👨‍💻 Author
 
 **Iulian-Cezar Iftode**
 
 GitHub:
 https://github.com/iftode
 
-LinkedIn:
-(Add your LinkedIn profile)
-
 Portfolio:
 https://bella24.site
 
 ---
 
-# License
+# 📄 License
 
-Educational & Portfolio Project
+This project was developed for educational and portfolio purposes.
