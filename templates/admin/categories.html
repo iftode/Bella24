@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-box">
+    <div class="admin-header">
+        <h1>Categorii</h1>
+        <a href="{{ url_for('admin_category_form') }}" class="btn">Adaugă categorie</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nume</th>
+                <th>Slug</th>
+                <th>Produse</th>
+                <th>Status</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for cat in categories %}
+            <tr>
+                <td>{{ cat.id }}</td>
+                <td>{{ cat.name }}</td>
+                <td>{{ cat.slug }}</td>
+                <td>{{ cat.products_count }}</td>
+                <td>
+                    {% if cat.is_active %}
+                    Vizibilă
+                    {% else %}
+                    Invizibilă
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('admin_category_form', cid=cat.id) }}">Editează</a> |
+                    <a href="{{ url_for('admin_category_toggle', cid=cat.id) }}">Schimbă status</a> |
+                    <a href="{{ url_for('admin_category_delete', cid=cat.id) }}"
+                       onclick="return confirm('Sigur ștergi categoria?')">
+                        Șterge
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

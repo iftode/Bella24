@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Comanda #{{ order.id }} - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+    <span class="eyebrow">DETALII COMANDĂ</span>
+    <h1>Comanda #{{ order.id }}</h1>
+
+    <div class="order-info-box">
+        <p><strong>Status:</strong> {{ order.status }}</p>
+        <p><strong>Total:</strong> {{ "%.2f"|format(order.total) }} lei</p>
+        <p><strong>Plată:</strong> {{ order.payment }}</p>
+        <p><strong>Adresă:</strong> {{ order.address }}</p>
+        <p><strong>Telefon:</strong> {{ order.phone }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+    </div>
+
+    <h2>Produse comandate</h2>
+
+    <div class="client-order-items">
+        {% for item in items %}
+        <div class="client-order-item">
+            {% if item.image %}
+            <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.product_name }}">
+            {% else %}
+            <div class="client-order-no-img">Fără poză</div>
+            {% endif %}
+
+            <div>
+                <h3>{{ item.product_name }}</h3>
+                <p>Cantitate: {{ item.qty }}</p>
+                <p>Preț: {{ "%.2f"|format(item.price) }} lei</p>
+                <p>Total produs: {{ "%.2f"|format(item.qty * item.price) }} lei</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2>Retur</h2>
+
+    {% if existing_return %}
+    <div class="return-status">
+        <strong>Cerere retur trimisă</strong>
+        <p><strong>Status:</strong> {{ existing_return.status }}</p>
+        <p><strong>Motiv:</strong> {{ existing_return.reason }}</p>
+        <p><strong>Data:</strong> {{ existing_return.created_at }}</p>
+    </div>
+    {% else %}
+    <form method="POST" action="{{ url_for('request_return', order_id=order.id) }}" class="form return-form">
+        <label>Motiv retur</label>
+        <textarea name="reason" placeholder="Ex: mărimea nu se potrivește, produsul nu este potrivit etc." required></textarea>
+
+        <button class="btn" type="submit">Solicită retur</button>
+    </form>
+    {% endif %}
+</section>
+
+{% endblock %}

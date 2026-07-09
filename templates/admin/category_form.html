@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-box">
+    <h1>
+        {% if category %}
+        Editează categoria
+        {% else %}
+        Adaugă categorie
+        {% endif %}
+    </h1>
+
+    <form method="POST" class="admin-form">
+        <label>Nume categorie</label>
+        <input type="text" name="name" required value="{{ category.name if category else '' }}">
+
+        <label>Slug</label>
+        <input type="text" name="slug" value="{{ category.slug if category else '' }}">
+
+        <label>Descriere</label>
+        <textarea name="description">{{ category.description if category else '' }}</textarea>
+
+        <label>
+            <input type="checkbox" name="is_active" {% if not category or category.is_active %}checked{% endif %}>
+            Vizibilă pe site
+        </label>
+
+        <button type="submit" class="btn">Salvează</button>
+        <a href="{{ url_for('admin_categories') }}">Înapoi</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Bella24 - Magazin online de haine{% endblock %}
+
+{% block content %}
+
+<section class="bella-hero-logo">
+    <div class="hero-logo-showcase">
+        <img src="{{ url_for('static', filename='images/bella24.png') }}" alt="Bella24" class="main-brand-logo">
+    </div>
+    <div class="hero-copy">
+        <span class="eyebrow">{{ t.new_collection|default('COLECȚIA NOUĂ') }}</span>
+        <h1>{{ t.hero_title|default('Eleganță') }}<br><em>{{ t.hero_emphasis|default('în fiecare zi') }}</em></h1>
+        <p>{{ t.hero_desc|default('Rochii, costume și ținute elegante pentru femei care vor stil, confort și rafinament.') }}</p>
+        <div class="hero-actions">
+            <a class="btn" href="{{ url_for('products') }}">{{ t.discover_collection|default('DESCOPERĂ COLECȚIA') }}</a>
+            <a class="btn outline" href="{{ url_for('promos') }}">{{ t.view_promotions|default('VEZI PROMOȚIILE') }}</a>
+        </div>
+    </div>
+</section>
+
+<section class="service-strip">
+    <div><span>🚚</span><strong>{{ t.service_shipping_title|default('Transport gratuit') }}</strong><small>{{ t.service_shipping_text|default('la comenzi peste 1001 lei') }}</small></div>
+    <div><span>🏅</span><strong>{{ t.service_quality_title|default('Produse de calitate') }}</strong><small>{{ t.service_quality_text|default('materiale atent selecționate') }}</small></div>
+    <div><span>↩</span><strong>{{ t.service_return_title|default('Retur simplu') }}</strong><small>{{ t.service_return_text|default('în 14 zile calendaristice') }}</small></div>
+    <div><span>🔒</span><strong>{{ t.service_payment_title|default('Plată securizată') }}</strong><small>{{ t.service_payment_text|default('100% sigură') }}</small></div>
+</section>
+
+<section class="section category-section">
+    <div class="section-title-row">
+        <div>
+            <h2>{{ t.popular_categories|default(t.categories_title|default('Categorii populare')) }}</h2>
+            <p>{{ t.categories_subtitle|default(t.categories_desc|default('Alege categoria preferată și găsește ținuta perfectă pentru tine.')) }}</p>
+        </div>
+    </div>
+
+    <div class="category-cards-pro">
+        {% for c in categories %}
+        {% set n = c.name_original|default(c.name)|lower %}
+        {% if 'roch' in n %}{% set icon='👗' %}{% elif 'bluz' in n %}{% set icon='👚' %}{% elif 'fust' in n %}{% set icon='◒' %}{% elif 'costum' in n %}{% set icon='🧥' %}{% elif 'palton' in n or 'geci' in n %}{% set icon='🧥' %}{% else %}{% set icon='✨' %}{% endif %}
+        <a class="category-card-pro" href="{{ url_for('products', category=c.slug) }}">
+            <span class="cat-icon">{{ icon }}</span>
+            <h3>{{ c.name }}</h3>
+            <small>{{ t.see_category }} →</small>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section products-home-section">
+    <div class="section-title-row">
+        <div>
+            <h2>{{ t.popular_products|default('Produse populare') }}</h2>
+            <p>{{ t.products_subtitle|default('Ținute atent selectate pentru orice ocazie.') }}</p>
+        </div>
+        <a class="see-all" href="{{ url_for('products') }}">{{ t.see_all_products|default('Vezi toate produsele') }} →</a>
+    </div>
+
+    <div class="product-grid">
+        {% for p in featured %}
+        {% include '_product_card.html' %}
+        {% else %}
+        <div class="card">
+            <h3>{{ t.no_products }}</h3>
+            <p>{{ t.add_products_admin }}</p>
+            <a class="btn" href="{{ url_for('admin_dashboard') }}">{{ t.go_admin }}</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="seo-text">
+    <h2>{{ t.seo_title }}</h2>
+    <p>{{ t.seo_desc }}</p>
+</section>
+
+{% endblock %}

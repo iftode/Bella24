@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero small">
+    <div>
+        <span class="eyebrow">COMANDĂ TRIMISĂ</span>
+        <h1>Mulțumim! Comanda #{{ order_id }} a fost înregistrată.</h1>
+        <p>Plata cu cardul este în lucru și nu funcționează momentan. Pentru confirmare rapidă, ne poți scrie pe WhatsApp.</p>
+        <a class="btn green" href="https://wa.me/40726031449" target="_blank" rel="noopener">Confirmă pe WhatsApp</a>
+        <a class="btn" href="{{ url_for('products') }}">Continuă cumpărăturile</a>
+    </div>
+</section>
+{% endblock %}

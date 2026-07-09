@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="detail">
+
+    <div class="gallery">
+        {% if images and images|length > 0 %}
+        <img id="mainProductImage"
+             src="{{ url_for('static', filename=images[0].image) }}"
+             alt="{{ product.name }}">
+
+        {% if images|length > 1 %}
+        <div class="thumbs">
+            {% for img in images %}
+            <button type="button" onclick="changeProductImage('{{ url_for('static', filename=img.image) }}')">
+                <img src="{{ url_for('static', filename=img.image) }}" alt="{{ product.name }}">
+            </button>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="no-image">{% if current_lang == 'en' %}No image{% else %}Fără imagine{% endif %}</div>
+        {% endif %}
+    </div>
+
+    <div class="info">
+        <span class="eyebrow">{{ product.category_name or ('Product' if current_lang == 'en' else 'Produs') }}</span>
+
+        <h1>{{ product.name }}</h1>
+
+        <div class="price">
+            {{ "%.2f"|format(product.price) }} lei
+            {% if product.old_price %}
+            <del>{{ "%.2f"|format(product.old_price) }} lei</del>
+            {% endif %}
+        </div>
+
+        <div class="product-meta">
+            <p>
+                <strong>{% if current_lang == 'en' %}Sizes:{% else %}Mărimi:{% endif %}</strong>
+                {{ product.size or ('Not specified' if current_lang == 'en' else 'Nespecificat') }}
+            </p>
+            <p>
+                <strong>{% if current_lang == 'en' %}Color:{% else %}Culoare:{% endif %}</strong>
+                {{ product.color or ('Not specified' if current_lang == 'en' else 'Nespecificat') }}
+            </p>
+            <p>
+                <strong>{% if current_lang == 'en' %}Material:{% else %}Material:{% endif %}</strong>
+                {{ product.material or ('Not specified' if current_lang == 'en' else 'Nespecificat') }}
+            </p>
+            <p>
+                <strong>{% if current_lang == 'en' %}Stock:{% else %}Stoc:{% endif %}</strong>
+                {{ product.stock }}
+            </p>
+        </div>
+
+        <p>{{ product.description }}</p>
+
+        <form method="POST" action="{{ url_for('add_to_cart', pid=product.id) }}" class="add-cart-form">
+
+            <label>{% if current_lang == 'en' %}Choose size{% else %}Alege mărimea{% endif %}</label>
+
+            <div class="size-selector">
+                {% if product.size %}
+                {% for s in product.size.split(',') %}
+                <label>
+                    <input type="radio"
+                           name="selected_size"
+                           value="{{ s.strip() }}"
+                           {% if loop.first %}checked{% endif %}>
+                    <span>{{ s.strip() }}</span>
+                </label>
+                {% endfor %}
+                {% else %}
+                <label>
+                    <input type="radio" name="selected_size" value="Universală" checked>
+                    <span>{% if current_lang == 'en' %}Universal{% else %}Universală{% endif %}</span>
+                </label>
+                {% endif %}
+            </div>
+
+            <label>{% if current_lang == 'en' %}Quantity{% else %}Cantitate{% endif %}</label>
+
+            <div class="quantity-selector">
+                <button type="button" onclick="decreaseQty()">−</button>
+
+                <input id="qtyInput"
+                       type="number"
+                       name="qty"
+                       value="1"
+                       min="1"
+                       max="{{ product.stock if product.stock else 99 }}"
+                       readonly>
+
+                <button type="button" onclick="increaseQty()">+</button>
+            </div>
+
+            <button class="btn" type="submit">
+                {% if current_lang == 'en' %}Add to cart{% else %}Adaugă în coș{% endif %}
+            </button>
+        </form>
+    </div>
+
+</section>
+
+<script>
+    function changeProductImage(src) {
+        const mainImage = document.getElementById("mainProductImage");
+
+        if (mainImage) {
+            mainImage.src = src;
+        }
+    }
+
+    function increaseQty() {
+        const input = document.getElementById("qtyInput");
+        const max = parseInt(input.getAttribute("max")) || 99;
+        let value = parseInt(input.value) || 1;
+
+        if (value < max) {
+            input.value = value + 1;
+        }
+    }
+
+    function decreaseQty() {
+        const input = document.getElementById("qtyInput");
+        let value = parseInt(input.value) || 1;
+
+        if (value > 1) {
+            input.value = value - 1;
+        }
+    }
+</script>
+
+{% endblock %}

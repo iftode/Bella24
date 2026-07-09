@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Bella24{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/bella24.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/bella24.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=mobile-final-7">
+</head>
+
+<body>
+
+    <div class="topbar bella-topbar">
+        <span>{{ t.delivery_fast|default('🚚 Livrare rapidă în România') }}</span>
+        <span>{{ t.free_shipping|default('🎁 Transport gratuit la comenzi peste 1001 lei') }}</span>
+        <span>💬 WhatsApp: +40 726 031 449</span>
+    </div>
+
+    <header class="bella-header">
+        <div class="bella-header-inner">
+            <a class="bella-logo" href="{{ url_for('index') }}" aria-label="Bella24">
+                <img src="{{ url_for('static', filename='images/bella24.png') }}" alt="Bella24">
+            </a>
+
+            <form class="bella-search" action="{{ url_for('products') }}" method="get">
+                <input name="q" value="{{ request.args.get('q','') }}" placeholder="{{ t.search_placeholder|default('Caută produse...') }}">
+                <button type="submit" aria-label="Search">⌕</button>
+            </form>
+
+            <nav class="bella-main-nav">
+                <a href="{{ url_for('index') }}">🏠 <span>{{ t.home }}</span></a>
+                <a href="{{ url_for('products') }}">👗 <span>{{ t.products }}</span></a>
+                <a href="{{ url_for('promos') }}">🏷️ <span>{{ t.promos }}</span></a>
+                <a href="{{ url_for('contact') }}">☎️ <span>{{ t.contact }}</span></a>
+            </nav>
+
+            <div class="bella-actions">
+                <select id="languageSelect" class="language-select" onchange="location.href='/set-language/' + this.value" aria-label="Select language">
+                    {% for code, label, name in lang_options %}
+                    <option value="{{ code }}" {% if current_lang == code %}selected{% endif %}>{{ label }} — {{ name }}</option>
+                    {% endfor %}
+                </select>
+
+                <a class="bella-action bella-cart" href="{{ url_for('cart') }}">🛒 {{ t.cart }} <b>{{ cart_count }}</b></a>
+
+                {% if session.get("user_email") %}
+                <a class="bella-action" href="{{ url_for('my_orders') }}">{{ t.my_orders|default('Comenzile mele') }}</a>
+                <a class="bella-action bella-dark" href="{{ url_for('logout') }}">{{ t.logout|default('Logout') }}</a>
+                {% else %}
+                <a class="bella-action" href="{{ url_for('login') }}">👤 {{ t.login }}</a>
+                <a class="bella-action bella-dark" href="{{ url_for('register') }}">👤+ {{ t.register }}</a>
+                {% endif %}
+            </div>
+
+            <details class="bella-admin-box">
+                <summary>⚙️ {{ t.admin_zone|default('Zona Admin') }}</summary>
+                <div class="bella-admin-links">
+                    {% if session.get("admin_logged") %}
+                    <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+                    <a href="{{ url_for('admin_products') }}">{{ t.admin_products|default('Produse') }}</a>
+                    <a href="{{ url_for('admin_categories') }}">{{ t.admin_categories|default('Categorii') }}</a>
+                    <a href="{{ url_for('admin_orders') }}">{{ t.admin_orders|default('Comenzi') }}</a>
+                    <a href="{{ url_for('admin_logout') }}">{{ t.admin_logout|default('Logout admin') }}</a>
+                    {% else %}
+                    <a href="{{ url_for('admin_login') }}">Admin</a>
+                    {% endif %}
+                </div>
+            </details>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flash">
+        {% for m in messages %}
+        <p>{{ m }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- CHATBOT BELLA24 -->
+    <div class="bella-chat-launcher" onclick="toggleBellaChat()">🤖</div>
+
+    <div id="bellaChatBox" class="bella-chat-box">
+        <div class="bella-chat-header">
+            <div>
+                <strong>Asistent Bella24</strong>
+                <span>Recomandări, mărimi, comenzi și ținute</span>
+            </div>
+            <button type="button" onclick="toggleBellaChat()">×</button>
+        </div>
+
+        <div id="bellaChatMessages" class="bella-chat-messages">
+            <div class="bella-message bot">
+                Bună! Îți pot răspunde exact la ce întrebi:
+                <br>
+                „Ce comenzi am?”, „Care este starea comenzii #3?”, „Ce rochie îmi recomanzi?” sau poți încărca o poză JPG/JPEG/PNG/WEBP.
+            </div>
+        </div>
+
+        <form id="bellaChatForm" class="bella-chat-form" enctype="multipart/form-data">
+            <button type="button" id="bellaImageButton" class="bella-upload">📷</button>
+
+            <input type="file"
+                   id="bellaChatImage"
+                   name="image"
+                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/jpg,image/png,image/webp"
+                   style="display:none;">
+
+            <input id="bellaChatInput"
+                   name="message"
+                   type="text"
+                   placeholder="Scrie întrebarea ta..."
+                   autocomplete="off">
+
+            <button type="submit">Trimite</button>
+        </form>
+
+        <div id="bellaImageName" style="font-size:12px; padding:4px 12px; color:#7a214f;"></div>
+    </div>
+
+    <a class="whatsapp" href="https://wa.me/40726031449" target="_blank" rel="noopener">💬</a>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentLang = "{{ current_lang }}";
+        const languageSelect = document.getElementById("languageSelect");
+
+        if (languageSelect) {
+            languageSelect.value = currentLang || "ro";
+        }
+
+        const form = document.getElementById("bellaChatForm");
+        const input = document.getElementById("bellaChatInput");
+        const image = document.getElementById("bellaChatImage");
+        const imageButton = document.getElementById("bellaImageButton");
+        const imageName = document.getElementById("bellaImageName");
+
+        if (imageButton && image) {
+            imageButton.addEventListener("click", function () {
+                image.click();
+            });
+        }
+
+        if (image && imageName) {
+            image.addEventListener("change", function () {
+                if (image.files.length > 0) {
+                    imageName.innerHTML = "Poză selectată: <b>" + image.files[0].name + "</b>";
+                } else {
+                    imageName.innerHTML = "";
+                }
+            });
+        }
+
+        if (!form || !input || !image) {
+            return;
+        }
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const message = input.value.trim();
+            const hasImage = image.files.length > 0;
+
+            if (!message && !hasImage) {
+                addBellaMessage("Scrie o întrebare sau selectează o poză.", "bot");
+                return;
+            }
+
+            let shown = message || "Am încărcat o poză.";
+
+            if (hasImage) {
+                shown += "<br><small>📷 Poză atașată: " + image.files[0].name + "</small>";
+            }
+
+            addBellaMessage(shown, "user");
+
+            const formData = new FormData();
+            formData.append("message", message);
+
+            if (hasImage) {
+                formData.append("image", image.files[0]);
+            }
+
+            input.value = "";
+
+            addBellaMessage("Analizez cererea ta...", "bot loading");
+
+            try {
+                const response = await fetch("{{ url_for('assistant_chat') }}", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                const loading = document.querySelector(".bella-message.loading");
+                if (loading) {
+                    loading.remove();
+                }
+
+                addBellaMessage(data.reply, "bot");
+
+                image.value = "";
+                if (imageName) {
+                    imageName.innerHTML = "";
+                }
+            } catch (error) {
+                const loading = document.querySelector(".bella-message.loading");
+                if (loading) {
+                    loading.remove();
+                }
+
+                addBellaMessage("A apărut o eroare. Verifică dacă serverul Flask rulează.", "bot");
+            }
+        });
+    });
+
+    function toggleBellaChat() {
+        const box = document.getElementById("bellaChatBox");
+
+        if (box) {
+            box.classList.toggle("open");
+        }
+    }
+
+    function addBellaMessage(text, type) {
+        const messages = document.getElementById("bellaChatMessages");
+
+        if (!messages) {
+            return;
+        }
+
+        const div = document.createElement("div");
+        div.className = "bella-message " + type;
+        div.innerHTML = text;
+
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
+    </script>
+
+</body>
+</html>

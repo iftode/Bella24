@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - Bella24{% endblock %}
+
+{% block content %}
+<section class="admin-login-page">
+    <div class="admin-login-card">
+        <div class="admin-lock">🔒</div>
+
+        <h1>Admin Login</h1>
+        <p>Acces în panoul de administrare</p>
+
+        <div class="admin-divider">♡</div>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="admin-error">
+            {{ messages[0] }}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('admin_login') }}">
+            <div class="admin-field">
+                <span>👤</span>
+                <div>
+                    <label for="username">Utilizator</label>
+                    <input type="text" id="username" name="username" placeholder="Introdu utilizatorul" required>
+                </div>
+            </div>
+
+            <div class="admin-field">
+                <span>🔐</span>
+                <div>
+                    <label for="password">Parolă</label>
+                    <input type="password" id="password" name="password" placeholder="Introdu parola" required>
+                </div>
+            </div>
+
+            <button type="submit" class="admin-login-btn">
+                🔒 Intră în admin
+            </button>
+        </form>
+
+        <div class="admin-restricted">
+            🛡 Acces restricționat
+        </div>
+    </div>
+</section>
+{% endblock %}

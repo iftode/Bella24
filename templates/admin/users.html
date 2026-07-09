@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Utilizatori Admin - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+    <div class="row">
+        <div>
+            <span class="eyebrow">ADMIN BELLA24</span>
+            <h1>Utilizatori</h1>
+            <p>Vezi conturile create și șterge utilizatorii dacă este nevoie.</p>
+        </div>
+
+        <a class="btn outline" href="{{ url_for('admin_dashboard') }}">
+            Înapoi la dashboard
+        </a>
+    </div>
+
+    {% if users %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nume</th>
+                <th>Email</th>
+                <th>Data contului</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>#{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.created_at }}</td>
+                <td>
+                    <form method="POST"
+                          action="{{ url_for('admin_delete_user', user_id=user.id) }}"
+                          onsubmit="return confirm('Sigur vrei să ștergi acest utilizator?');">
+                        <button class="btn danger small" type="submit">
+                            Șterge
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="card">
+        <h3>Nu există utilizatori</h3>
+        <p>Conturile create de clienți vor apărea aici.</p>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

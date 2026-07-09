@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel">
+  <h1>{{'Editează produsul' if product else 'Adaugă produs nou'}}</h1>
+  <form method="post" enctype="multipart/form-data" class="form grid2">
+    <label>Nume<input name="name" required value="{{product.name if product else ''}}"></label>
+    <label>Categorie<select name="category_id">{% for c in categories %}<option value="{{c.id}}" {% if product and product.category_id==c.id %}selected{% endif %}>{{c.name}}</option>{% endfor %}</select></label>
+    <label>Preț<input name="price" type="number" step="0.01" required value="{{product.price if product else ''}}"></label>
+    <label>Preț vechi<input name="old_price" type="number" step="0.01" value="{{product.old_price if product and product.old_price else ''}}"></label>
+    <label>Stoc<input name="stock" type="number" value="{{product.stock if product else 0}}"></label>
+    <label>Mărimi<input name="size" placeholder="S, M, L" value="{{product.size if product else ''}}"></label>
+    <label>Culoare<input name="color" value="{{product.color if product else ''}}"></label>
+    <label>Material<input name="material" value="{{product.material if product else ''}}"></label>
+
+    <label class="wide">Descriere RO<textarea name="description" rows="7">{{product.description if product else ''}}</textarea></label>
+    <label class="check wide"><input type="checkbox" name="auto_translate_descriptions" checked> Tradu automat numele, culoarea, materialul și descrierile goale când salvez produsul</label>
+
+    <label class="wide">Description EN<textarea name="description_en" rows="5">{{product.description_en if product and product.description_en else ''}}</textarea></label>
+    <label class="wide">Beschreibung DE<textarea name="description_de" rows="5">{{product.description_de if product and product.description_de else ''}}</textarea></label>
+    <label class="wide">Leírás HU<textarea name="description_hu" rows="5">{{product.description_hu if product and product.description_hu else ''}}</textarea></label>
+    <label class="wide">Описание BG<textarea name="description_bg" rows="5">{{product.description_bg if product and product.description_bg else ''}}</textarea></label>
+    <label class="wide">Περιγραφή EL<textarea name="description_el" rows="5">{{product.description_el if product and product.description_el else ''}}</textarea></label>
+    <label class="wide">Описание RU<textarea name="description_ru" rows="5">{{product.description_ru if product and product.description_ru else ''}}</textarea></label>
+    <label class="wide">Опис UK<textarea name="description_uk" rows="5">{{product.description_uk if product and product.description_uk else ''}}</textarea></label>
+    <label class="wide">Opis SR<textarea name="description_sr" rows="5">{{product.description_sr if product and product.description_sr else ''}}</textarea></label>
+
+    <label class="wide">Poze produs - alegi câte vrei<input name="images" type="file" accept="image/*" multiple></label>
+    <label class="check"><input type="checkbox" name="is_promo" {% if product and product.is_promo %}checked{% endif %}> Promoție</label>
+    <label class="check"><input type="checkbox" name="is_active" {% if not product or product.is_active %}checked{% endif %}> Activ</label>
+    <button class="btn wide">Salvează produsul</button>
+  </form>
+  {% if images %}
+  <h2>Poze existente</h2>
+  <div class="image-admin">
+    {% for im in images %}
+    <div><img src="{{ url_for('static', filename=im.image) }}"><p>{% if im.is_main %}<b>Principală</b>{% else %}<a href="{{ url_for('admin_image_main', image_id=im.id, pid=product.id) }}">Setează principală</a>{% endif %}</p><a onclick="return confirm('Ștergi poza?')" href="{{ url_for('admin_image_delete', image_id=im.id, pid=product.id) }}">Șterge</a></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

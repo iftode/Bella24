@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Comenzile mele - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+    <span class="eyebrow">CONTUL MEU</span>
+    <h1>Comenzile mele</h1>
+    <p>Aici vezi comenzile plasate și poți solicita retur dacă este nevoie.</p>
+
+    {% if orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>Comandă</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Acțiune</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.created_at }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ "%.2f"|format(order.total) }} lei</td>
+                <td>
+                    <a class="btn" href="{{ url_for('order_detail_client', order_id=order.id) }}">
+                        Vezi comanda
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="card">
+        <h3>Nu ai comenzi încă</h3>
+        <p>După ce plasezi o comandă cu emailul contului tău, o vei vedea aici.</p>
+        <a class="btn" href="{{ url_for('products') }}">Vezi produsele</a>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

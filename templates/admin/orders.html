@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Comenzi Admin - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+    <div class="row">
+        <div>
+            <span class="eyebrow">ADMIN BELLA24</span>
+            <h1>Comenzi</h1>
+            <p>Gestionează comenzile, statusul, AWB-ul, factura și retururile.</p>
+        </div>
+
+        <a class="btn outline" href="{{ url_for('admin_dashboard') }}">
+            Înapoi la dashboard
+        </a>
+    </div>
+
+    {% if orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Email</th>
+                <th>Telefon</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.name }}</td>
+                <td>{{ order.email }}</td>
+                <td>{{ order.phone }}</td>
+                <td>{{ "%.2f"|format(order.total) }} lei</td>
+                <td>
+                    <span class="admin-status-badge">
+                        {{ order.status }}
+                    </span>
+                </td>
+                <td>{{ order.created_at }}</td>
+                <td>
+                    <a class="btn small" href="{{ url_for('admin_order_detail', order_id=order.id) }}">
+                        Gestionează
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="card">
+        <h3>Nu există comenzi</h3>
+        <p>Comenzile plasate de clienți vor apărea aici.</p>
+        <a class="btn" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

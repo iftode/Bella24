@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Coș de cumpărături - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="two-col">
+
+    <div class="panel">
+        <span class="eyebrow">PRODUSE ADĂUGATE</span>
+        <h1>Produsele din coș</h1>
+
+        {% if items %}
+        <form method="POST" action="{{ url_for('cart') }}">
+
+            {% for item in items %}
+            <div class="cart-item">
+
+                <div>
+                    {% if item.p.image %}
+                    <img src="{{ url_for('static', filename=item.p.image) }}" alt="{{ item.p.name }}">
+                    {% else %}
+                    <div class="cart-no-img">Fără poză</div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h3>{{ item.p.name }}</h3>
+
+                    <div class="cart-tags">
+                        <span>Mărime: {{ item.selected_size }}</span>
+                        <span>Culoare: {{ item.p.color or 'Nespecificată' }}</span>
+                    </div>
+
+                    <p class="cart-unit-price">
+                        {{ "%.2f"|format(item.p.price) }} lei / buc.
+                    </p>
+                </div>
+
+                <div>
+                    <label>Cantitate</label>
+                    <input type="number"
+                           name="qty_{{ item.cart_key }}"
+                           value="{{ item.qty }}"
+                           min="1"
+                           max="{{ item.p.stock if item.p.stock else 99 }}">
+                </div>
+
+                <div class="cart-line-total">
+                    <small>Total produs</small>
+                    <strong>{{ "%.2f"|format(item.total) }} lei</strong>
+                </div>
+
+                <div>
+                    <a class="cart-remove" href="{{ url_for('remove_from_cart', cart_key=item.cart_key) }}">
+                        Șterge
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+
+            <button class="btn" type="submit">Actualizează coșul</button>
+            <a class="btn outline" href="{{ url_for('products') }}">Continuă cumpărăturile</a>
+        </form>
+        {% else %}
+        <div class="card">
+            <h3>Coșul este gol</h3>
+            <p>Adaugă produse în coș pentru a continua comanda.</p>
+            <a class="btn" href="{{ url_for('products') }}">Vezi produsele</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <aside class="summary">
+        <span class="eyebrow">SUMAR COMANDĂ</span>
+        <h2>Total de plată</h2>
+
+        <p>
+            <span>Subtotal</span>
+            <strong>{{ "%.2f"|format(subtotal) }} lei</strong>
+        </p>
+
+        <p>
+            <span>Reducere</span>
+            <strong>-{{ "%.2f"|format(discount) }} lei</strong>
+        </p>
+
+        <p>
+            <span>Transport</span>
+            <strong>
+                {% if shipping == 0 %}
+                Gratuit
+                {% else %}
+                {{ "%.2f"|format(shipping) }} lei
+                {% endif %}
+            </strong>
+        </p>
+
+        <p class="summary-total">
+            <span>Total</span>
+            <strong>{{ "%.2f"|format(total) }} lei</strong>
+        </p>
+
+        {% if items %}
+        <a class="btn full" href="{{ url_for('checkout') }}">Finalizează comanda</a>
+        {% endif %}
+
+        <div class="summary-note">
+            🚚 Transport gratuit pentru comenzi peste 1001 lei.
+        </div>
+
+        <div class="summary-note">
+            📦 Produsele cu mărimi diferite apar separat în coș.
+        </div>
+    </aside>
+
+</section>
+
+{% endblock %}

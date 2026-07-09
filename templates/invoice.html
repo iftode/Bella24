@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Factura {{ invoice.invoice_number }} - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="panel invoice-panel">
+
+    <div class="row no-print">
+        <a class="btn outline" href="javascript:history.back()">Înapoi</a>
+        <button class="btn" onclick="window.print()">Printează / Salvează PDF</button>
+    </div>
+
+    <div class="invoice-header">
+        <div>
+            <h1>Bella24</h1>
+            <p>Magazin online de haine</p>
+            <p><strong>Email:</strong> contact@bella24.ro</p>
+            <p><strong>WhatsApp:</strong> +40 726 031 449</p>
+        </div>
+
+        <div>
+            <h2>FACTURĂ FISCALĂ</h2>
+            <p><strong>Serie și număr:</strong> {{ invoice.invoice_number }}</p>
+            <p><strong>Data emiterii:</strong> {{ invoice.created_at }}</p>
+            <p><strong>Comandă:</strong> #{{ order.id }}</p>
+            <p><strong>Monedă:</strong> RON</p>
+        </div>
+    </div>
+
+    <div class="invoice-grid">
+        <div class="invoice-box">
+            <h3>Furnizor</h3>
+            <p><strong>Bella24 SRL</strong></p>
+            <p><strong>CUI:</strong> ROXXXXXXXX</p>
+            <p><strong>Reg. Com.:</strong> JXX/XXXX/2026</p>
+            <p><strong>Sediu:</strong> Str. Exemplu nr. 1, România</p>
+            <p><strong>IBAN:</strong> RO00 BANK 0000 0000 0000 0000</p>
+            <p><strong>Banca:</strong> Banca Exemplu</p>
+            <p><strong>TVA:</strong> Neplătitor TVA</p>
+        </div>
+
+        <div class="invoice-box">
+            <h3>Client</h3>
+            <p><strong>{{ invoice.customer_name }}</strong></p>
+            <p><strong>Email:</strong> {{ invoice.customer_email }}</p>
+            <p><strong>Adresă:</strong> {{ invoice.customer_address }}</p>
+        </div>
+    </div>
+
+    <h2>Produse</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produs</th>
+                <th>Mărime</th>
+                <th>Cantitate</th>
+                <th>Preț unitar</th>
+                <th>TVA</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.selected_size or 'Universală' }}</td>
+                <td>{{ item.qty }}</td>
+                <td>{{ "%.2f"|format(item.price) }} lei</td>
+                <td>0%</td>
+                <td>{{ "%.2f"|format(item.qty * item.price) }} lei</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="invoice-totals">
+        <p>
+            <span>Subtotal</span>
+            <strong>{{ "%.2f"|format(invoice.subtotal) }} lei</strong>
+        </p>
+
+        <p>
+            <span>Reducere</span>
+            <strong>-{{ "%.2f"|format(invoice.discount) }} lei</strong>
+        </p>
+
+        <p>
+            <span>Transport</span>
+            <strong>{{ "%.2f"|format(invoice.shipping) }} lei</strong>
+        </p>
+
+        <p>
+            <span>TVA</span>
+            <strong>0.00 lei</strong>
+        </p>
+
+        <p class="invoice-total-final">
+            <span>Total de plată</span>
+            <strong>{{ "%.2f"|format(invoice.total) }} lei</strong>
+        </p>
+    </div>
+
+    <div class="invoice-footer">
+        <p>Factura a fost emisă electronic și este valabilă fără semnătură și ștampilă.</p>
+        <p>Factura aparține comenzii #{{ order.id }}.</p>
+        <p>Mulțumim pentru cumpărături!</p>
+    </div>
+
+</section>
+
+{% endblock %}

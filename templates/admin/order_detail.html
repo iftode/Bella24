@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestionare comandă #{{ order.id }} - Bella24{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+    <div class="row">
+        <div>
+            <span class="eyebrow">ADMIN COMANDĂ</span>
+            <h1>Comanda #{{ order.id }}</h1>
+            <p>Gestionează statusul, AWB-ul, factura și returul comenzii.</p>
+        </div>
+
+        <div class="admin-top-actions">
+            <a class="btn outline" href="{{ url_for('admin_orders') }}">Înapoi la comenzi</a>
+
+            <form method="POST"
+                  action="{{ url_for('admin_delete_order', order_id=order.id) }}"
+                  onsubmit="return confirm('Sigur vrei să ștergi definitiv această comandă?');">
+                <button class="btn danger" type="submit">Șterge comanda</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-order-grid">
+        <div class="admin-order-card">
+            <h2>Date client</h2>
+            <p><strong>Nume:</strong> {{ order.name }}</p>
+            <p><strong>Email:</strong> {{ order.email }}</p>
+            <p><strong>Telefon:</strong> {{ order.phone }}</p>
+            <p><strong>Adresă:</strong> {{ order.address }}</p>
+            <p><strong>Plată:</strong> {{ order.payment }}</p>
+            <p><strong>Total:</strong> {{ "%.2f"|format(order.total) }} lei</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <p><strong>Data:</strong> {{ order.created_at }}</p>
+
+            {% if order.admin_note %}
+            <p><strong>Notă admin:</strong> {{ order.admin_note }}</p>
+            {% endif %}
+        </div>
+
+        <div class="admin-order-card">
+            <h2>Actualizare status</h2>
+
+            <form method="POST" action="{{ url_for('admin_update_order_status', order_id=order.id) }}" class="form">
+                <label>Status comandă</label>
+                <select name="status" id="orderStatusSelect">
+                    <option value="Nouă">Nouă</option>
+                    <option value="Confirmată">Confirmată</option>
+                    <option value="În pregătire">În pregătire</option>
+                    <option value="Expediată">Expediată</option>
+                    <option value="Livrată">Livrată</option>
+                    <option value="Anulată">Anulată</option>
+                    <option value="Retur acceptat">Retur acceptat</option>
+                    <option value="Retur refuzat">Retur refuzat</option>
+                </select>
+
+                <label>Notă admin</label>
+                <textarea name="admin_note" placeholder="Ex: client contactat, comandă confirmată etc.">{{ order.admin_note or '' }}</textarea>
+
+                <button class="btn full" type="submit">Salvează status</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-order-card">
+        <h2>Produse comandate</h2>
+
+        {% if items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Produs</th>
+                    <th>Mărime</th>
+                    <th>Cantitate</th>
+                    <th>Preț</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <div class="admin-order-product">
+                            {% if item.image %}
+                            <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.product_name }}">
+                            {% endif %}
+                            <span>{{ item.product_name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ item.selected_size or 'Universală' }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>{{ "%.2f"|format(item.price) }} lei</td>
+                    <td>{{ "%.2f"|format(item.qty * item.price) }} lei</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nu există produse pentru această comandă.</p>
+        {% endif %}
+    </div>
+
+    <div class="admin-order-grid">
+        <div class="admin-order-card">
+            <h2>AWB / Expediere</h2>
+
+            {% if shipment %}
+            <div class="admin-alert success">
+                <strong>AWB creat</strong>
+                <p><strong>Curier:</strong> {{ shipment.courier }}</p>
+                <p><strong>AWB:</strong> {{ shipment.awb }}</p>
+                <p><strong>Status:</strong> {{ shipment.status }}</p>
+
+                {% if shipment.delivery_type == 'easybox' %}
+                <p><strong>Livrare:</strong> Sameday Easybox</p>
+                <p><strong>Easybox:</strong> {{ shipment.easybox_name }}</p>
+                <p><strong>Adresă Easybox:</strong> {{ shipment.easybox_address }}</p>
+                {% else %}
+                <p><strong>Livrare:</strong> La adresă</p>
+                {% endif %}
+
+                {% if shipment.tracking_url %}
+                <p>
+                    <a href="{{ shipment.tracking_url }}" target="_blank">
+                        Vezi tracking colet
+                    </a>
+                </p>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="admin-alert">
+                Nu există AWB creat pentru această comandă.
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('admin_create_awb', order_id=order.id) }}" class="form">
+                <label>Alege curier</label>
+                <select name="courier" id="courierSelect" onchange="toggleEasyboxFields()">
+                    <option value="Fan Courier">Fan Courier</option>
+                    <option value="Sameday">Sameday</option>
+                </select>
+
+                <div id="deliveryTypeBox" class="easybox-options">
+                    <label>Tip livrare Sameday</label>
+
+                    <label class="pay">
+                        <input type="radio" name="delivery_type" value="address" checked onchange="toggleEasyboxFields()">
+                        Livrare la adresă
+                    </label>
+
+                    <label class="pay">
+                        <input type="radio" name="delivery_type" value="easybox" onchange="toggleEasyboxFields()">
+                        Livrare la Easybox
+                    </label>
+                </div>
+
+                <div id="easyboxFields" class="easybox-fields">
+                    <label>Easybox selectat</label>
+                    <input type="text" name="easybox_name" placeholder="Ex: Easybox Kaufland Piatra Neamț">
+
+                    <label>Adresă Easybox</label>
+                    <input type="text" name="easybox_address" placeholder="Ex: Str. Exemplu nr. 10, Piatra Neamț">
+                </div>
+
+                <div class="admin-alert">
+                    AWB-ul și linkul de tracking se generează automat. Pentru legătură reală cu Fan Courier / Sameday este necesară integrare API cu cheie de la curier.
+                </div>
+
+                <button class="btn full" type="submit">
+                    Generează AWB automat
+                </button>
+            </form>
+        </div>
+
+        <div class="admin-order-card">
+            <h2>Factură</h2>
+
+            {% if invoice %}
+            <div class="admin-alert success">
+                <strong>Factura există</strong>
+                <p><strong>Număr:</strong> {{ invoice.invoice_number }}</p>
+                <p><strong>Total:</strong> {{ "%.2f"|format(invoice.total) }} lei</p>
+                <p><strong>Creată de:</strong> {{ invoice.created_by }}</p>
+                <p><strong>Data:</strong> {{ invoice.created_at }}</p>
+            </div>
+
+            <a class="btn full" href="{{ url_for('admin_invoice_view', order_id=order.id) }}">
+                Vezi factura
+            </a>
+            {% else %}
+            <div class="admin-alert">
+                Nu există factură creată pentru această comandă.
+            </div>
+
+            <a class="btn full" href="{{ url_for('admin_create_invoice', order_id=order.id) }}">
+                Creează factura
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="admin-order-card">
+        <h2>Retur</h2>
+
+        {% if return_request %}
+        <div class="admin-alert">
+            <p><strong>Status retur:</strong> {{ return_request.status }}</p>
+            <p><strong>Motiv client:</strong> {{ return_request.reason }}</p>
+            <p><strong>Data cererii:</strong> {{ return_request.created_at }}</p>
+
+            {% if return_request.admin_note %}
+            <p><strong>Notă admin:</strong> {{ return_request.admin_note }}</p>
+            {% endif %}
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_update_return', order_id=order.id) }}" class="form">
+            <label>Status retur</label>
+            <select name="return_status" id="returnStatusSelect">
+                <option value="Cerere trimisă">Cerere trimisă</option>
+                <option value="În analiză">În analiză</option>
+                <option value="Acceptat">Acceptat</option>
+                <option value="Refuzat">Refuzat</option>
+                <option value="Finalizat">Finalizat</option>
+            </select>
+
+            <label>Notă admin pentru retur</label>
+            <textarea name="admin_note" placeholder="Ex: retur acceptat, trimite produsul prin curier etc.">{{ return_request.admin_note or '' }}</textarea>
+
+            <button class="btn full" type="submit">Actualizează retur</button>
+        </form>
+        {% else %}
+        <div class="admin-alert">
+            Clientul nu a solicitat retur pentru această comandă.
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const orderStatus = "{{ order.status }}";
+    const orderSelect = document.getElementById("orderStatusSelect");
+
+    if (orderSelect) {
+        orderSelect.value = orderStatus;
+    }
+
+    const returnStatus = "{% if return_request %}{{ return_request.status }}{% endif %}";
+    const returnSelect = document.getElementById("returnStatusSelect");
+
+    if (returnSelect && returnStatus) {
+        returnSelect.value = returnStatus;
+    }
+
+    const courierSelect = document.getElementById("courierSelect");
+    if (courierSelect) {
+        courierSelect.value = "{% if shipment %}{{ shipment.courier }}{% else %}Fan Courier{% endif %}";
+    }
+
+    const deliveryType = "{% if shipment %}{{ shipment.delivery_type }}{% else %}address{% endif %}";
+    const deliveryInput = document.querySelector('input[name="delivery_type"][value="' + deliveryType + '"]');
+
+    if (deliveryInput) {
+        deliveryInput.checked = true;
+    }
+
+    toggleEasyboxFields();
+});
+
+function toggleEasyboxFields() {
+    const courier = document.getElementById("courierSelect").value;
+    const deliveryTypeBox = document.getElementById("deliveryTypeBox");
+    const easyboxFields = document.getElementById("easyboxFields");
+    const easyboxSelected = document.querySelector('input[name="delivery_type"][value="easybox"]');
+
+    if (courier === "Sameday") {
+        deliveryTypeBox.style.display = "block";
+
+        if (easyboxSelected && easyboxSelected.checked) {
+            easyboxFields.style.display = "block";
+        } else {
+            easyboxFields.style.display = "none";
+        }
+    } else {
+        deliveryTypeBox.style.display = "none";
+        easyboxFields.style.display = "none";
+    }
+}
+</script>
+
+{% endblock %}
